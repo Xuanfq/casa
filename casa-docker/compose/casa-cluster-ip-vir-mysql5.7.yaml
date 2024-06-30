@@ -1,0 +1,90 @@
+version: "3.8"
+services:
+  casa1:
+    container_name: casa1
+    image: casa/nacos-server:${NACOS_VERSION}
+    build:
+      context: ../image/nacos/2.3.2/
+      dockerfile: ./Dockerfile
+    networks:
+      nacos_net:
+        ipv4_address: 172.16.238.10
+    volumes:
+      - ./mountpoint/casa-cluster-logs/casa1:/home/nacos/logs
+    ports:
+      - "18848:8848"
+      - "19848:9848"
+    env_file:
+      - ../env/casa-cluster-ip-vir-nacos.env
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  casa2:
+    container_name: casa2
+    image: casa/nacos-server:${NACOS_VERSION}
+    build:
+      context: ../image/nacos/2.3.2/
+      dockerfile: ./Dockerfile
+    networks:
+      nacos_net:
+        ipv4_address: 172.16.238.11
+    volumes:
+      - ./mountpoint/casa-cluster-logs/casa2:/home/nacos/logs
+    ports:
+      - "28848:8848"
+      - "29848:9848"
+    env_file:
+      - ../env/casa-cluster-ip-vir-nacos.env
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+  casa3:
+    container_name: casa3
+    image: casa/nacos-server:${NACOS_VERSION}
+    build:
+      context: ../image/nacos/2.3.2/
+      dockerfile: ./Dockerfile
+    networks:
+      nacos_net:
+        ipv4_address: 172.16.238.12
+    volumes:
+      - ./mountpoint/casa-cluster-logs/casa3:/home/nacos/logs
+    ports:
+      - "38848:8848"
+      - "39848:9848"
+    env_file:
+      - ../env/casa-cluster-ip-vir-nacos.env
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    container_name: mysql
+    build:
+      context: .
+      dockerfile: ../image/mysql/5.7/Dockerfile
+    image: casa/mysql-server:5.7
+    networks:
+      nacos_net:
+        ipv4_address: 172.16.238.13
+    env_file:
+      - ../env/casa-cluster-ip-vir-mysql.env
+    volumes:
+      - ./mountpoint/mysql:/var/lib/mysql
+    ports:
+      - "13306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+networks:
+  nacos_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
