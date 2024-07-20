@@ -13,15 +13,15 @@ compose/compose: Docker compose for casa  # refer image & env
 - example of virtual cluster (non production env)
 ```
 cd casa-docker
-docker-compose compose/casa-cluster-ip-vir-mysql5.7.yaml up
+docker-compose -f compose/casa-cluster-ip-vir-mysql5.7.yaml up
 ```
 
 - single point of cluster
 ```
 cd casa-docker
 # run to start the mysql if you don't have a database
-# docker-compose compose/casa-cluster-ip-singlepoint-mysql5.7.yaml up
-docker-compose compose/casa-cluster-ip-singlepoint-nacos.yaml up
+# docker-compose -f compose/casa-cluster-ip-singlepoint-mysql5.7.yaml up
+docker-compose -f compose/casa-cluster-ip-singlepoint-nacos.yaml up
 ```
 
 - Others reference: `cd nacos-docker-2.3.2`
